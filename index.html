@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Data Collection ADED</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,500;7..72,700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a lecture handbook. Sticky section bar, one readable column, wide tables scroll inside their own box, numbered citations link to a reference list. */
+:root{
+  --bg:#fffaf0; --surface:#ffffff; --ink:#1f2433; --muted:#5b6070; --line:#f1dfc6;
+  --accent:#0d7c86; --accent-soft:#dcf4f1; --mark:#d9541e; --mark-soft:#fff0d6;
+  --good:#23824f; --warn:#b85a00;
+  --hero:linear-gradient(120deg,#fff3c4 0%,#ffd6a5 45%,#ffc2c7 100%);
+  --nav:#ffffff;
+  --f-display:"Literata", Georgia, "Times New Roman", serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1b1726; --surface:#262035; --ink:#f3eefb; --muted:#b9b0cc; --line:#3d3452;
+  --accent:#5fd6c8; --accent-soft:#1f3a3f; --mark:#ffa45c; --mark-soft:#3d2a1d;
+  --good:#6fd39a; --warn:#ffb057;
+  --hero:linear-gradient(120deg,#3a2559 0%,#5a2d55 50%,#6b3a2f 100%); --nav:#262035; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#1b1726; --surface:#262035; --ink:#f3eefb; --muted:#b9b0cc; --line:#3d3452;
+  --accent:#5fd6c8; --accent-soft:#1f3a3f; --mark:#ffa45c; --mark-soft:#3d2a1d;
+  --good:#6fd39a; --warn:#ffb057;
+  --hero:linear-gradient(120deg,#3a2559 0%,#5a2d55 50%,#6b3a2f 100%); --nav:#262035; color-scheme:dark }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:64px}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:17px; line-height:1.65}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--surface)}
+a{color:var(--accent)}
+a:focus-visible, button:focus-visible, summary:focus-visible{outline:3px solid var(--mark); outline-offset:2px; border-radius:4px}
+
+.gutter{padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px))}
+.wrap{max-width:860px; margin:0 auto}
+
+/* draft banner */
+.draft{background:var(--mark-soft); color:var(--ink); border-bottom:1px solid var(--line); font-size:14px}
+.draft .wrap{padding-block:8px}
+.draft b{color:var(--mark)}
+
+/* header */
+header.top{background:var(--hero); border-bottom:1px solid var(--line)}
+header.top .eyebrow{color:var(--ink); opacity:.8; line-height:1.5}
+header.top .eyebrow .course{text-transform:none; letter-spacing:0; font-weight:400; font-size:14px}
+header.top .lede{color:var(--ink); opacity:.85}
+h2{color:var(--ink)}
+.secno{background:var(--mark-soft); padding:2px 8px; border-radius:99px; display:inline-block !important}
+header.top .wrap{padding-block:40px 32px; display:grid; gap:14px}
+.eyebrow{font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:700}
+h1{font-family:var(--f-display); font-weight:700; font-size:clamp(30px,5vw,44px); line-height:1.15; margin:0; text-wrap:balance}
+.lede{font-size:19px; color:var(--muted); margin:0; max-width:62ch}
+.outcomes{margin:6px 0 0; padding:0; list-style:none; display:grid; gap:6px}
+.outcomes li{padding-left:26px; position:relative}
+.outcomes li::before{content:"✓"; position:absolute; left:0; color:var(--good); font-weight:700}
+
+/* nav */
+nav.sections{position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--surface); border-bottom:1px solid var(--line)}
+nav.sections .wrap{display:flex; gap:4px; overflow-x:auto; padding-block:8px; scrollbar-width:thin}
+nav.sections a{flex:none; text-decoration:none; color:var(--muted); font-size:14px; padding:6px 10px; border-radius:6px; white-space:nowrap}
+nav.sections a:hover{background:var(--accent-soft); color:var(--ink)}
+nav.sections{background:var(--nav); border-bottom:3px solid var(--mark)}
+
+main .wrap{padding-block:12px 64px}
+section{padding-block:36px 8px; border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:0}
+h2{font-family:var(--f-display); font-weight:700; font-size:clamp(24px,3.4vw,30px); line-height:1.25; margin:0 0 6px; text-wrap:balance}
+.secno{font-family:var(--f-mono); font-size:13px; color:var(--mark); display:block; margin-bottom:4px; letter-spacing:.04em}
+h3{font-family:var(--f-display); font-weight:500; font-size:20px; margin:28px 0 6px}
+p{margin:0 0 14px; max-width:68ch}
+ul,ol{max-width:66ch; padding-left:22px; margin:0 0 14px}
+li{margin-bottom:6px}
+.key{background:var(--accent-soft); border-radius:8px; padding:14px 16px; margin:18px 0; max-width:68ch}
+.key strong:first-child{display:block; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-bottom:4px}
+.term{font-weight:700}
+sup.cite a{font-family:var(--f-mono); font-size:11px; text-decoration:none; padding:0 2px; border-radius:3px; background:var(--accent-soft)}
+
+/* tables */
+.tablebox{overflow-x:auto; margin:16px 0 20px; border:1px solid var(--line); border-radius:8px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:15px; min-width:560px}
+th,td{text-align:left; vertical-align:top; padding:10px 12px; border-bottom:1px solid var(--line)}
+th{font-size:13px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td code, .mono{font-family:var(--f-mono); font-size:13.5px}
+.pill{display:inline-block; font-size:12px; font-weight:700; padding:1px 8px; border-radius:99px; white-space:nowrap}
+.pill.yes{background:color-mix(in srgb, var(--good) 16%, transparent); color:var(--good)}
+.pill.part{background:color-mix(in srgb, var(--warn) 16%, transparent); color:var(--warn)}
+.pill.no{background:var(--bg); color:var(--muted); border:1px solid var(--line)}
+
+/* phones: tables become stacked cards, one row per card, each cell labelled with its column name */
+@media (max-width:640px){
+  body{font-size:16px}
+  .tablebox{overflow:visible; border:0; background:transparent}
+  table{min-width:0}
+  table thead{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+  table, tbody, tr, td{display:block; width:100% !important}
+  tr{background:var(--surface); border:1px solid var(--line); border-radius:8px; margin-bottom:10px; padding:6px 0}
+  td{border-bottom:0; padding:6px 14px}
+  td[data-label]::before{content:attr(data-label); display:block; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:2px}
+  td:first-child{font-size:16px}
+  td:first-child::before{display:none}
+  header.top .wrap{padding-block:28px 24px}
+  .lede{font-size:17px}
+  .q button{padding:10px 12px}
+}
+nav.sections .wrap{-webkit-overflow-scrolling:touch}
+@media (max-width:860px){ nav.sections .wrap{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent); mask-image:linear-gradient(90deg,#000 85%,transparent); padding-right:40px} }
+nav.sections a{min-height:36px; display:inline-flex; align-items:center}
+
+/* chart */
+figure{margin:20px 0; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:16px; max-width:68ch}
+figcaption{font-size:14px; color:var(--muted); margin-top:8px}
+.bars{display:grid; gap:12px}
+.bar-row{display:grid; grid-template-columns:150px 1fr; gap:10px; align-items:center; font-size:15px}
+.bar-track{background:var(--bg); border-radius:4px; height:26px; position:relative; border:1px solid var(--line)}
+.bar-fill{height:100%; border-radius:3px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; font-family:var(--f-mono); font-size:13px; font-weight:500; color:var(--surface)}
+.bar-fill.paper{background:var(--muted)}
+.bar-fill.app{background:var(--accent)}
+.scale{display:grid; grid-template-columns:150px 1fr; gap:10px; font-family:var(--f-mono); font-size:11px; color:var(--muted)}
+.scale div:last-child{display:flex; justify-content:space-between}
+@media (max-width:520px){ .bar-row,.scale{grid-template-columns:96px 1fr} }
+
+/* steps */
+ol.steps{list-style:none; padding:0; counter-reset:s; display:grid; gap:10px; max-width:70ch}
+ol.steps > li{counter-increment:s; display:grid; grid-template-columns:36px 1fr; gap:12px; margin:0}
+ol.steps > li::before{content:counter(s); font-family:var(--f-mono); font-weight:500; width:30px; height:30px; border-radius:50%; border:2px solid var(--accent); color:var(--accent); display:grid; place-items:center; font-size:14px}
+ol.steps > li > div{min-width:0}
+ol.steps b{display:block}
+
+/* form mock */
+.formmock{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:16px; max-width:68ch; display:grid; gap:12px; margin:16px 0}
+.fm-q{display:grid; gap:4px}
+.fm-q label{font-weight:700; font-size:15px}
+.fm-q .hint{font-size:13px; color:var(--muted)}
+.fm-opts{display:flex; gap:14px; flex-wrap:wrap; font-size:15px}
+.fm-sub{border-left:3px solid var(--mark); padding-left:12px; display:grid; gap:4px}
+.fm-sub .tag{font-family:var(--f-mono); font-size:12px; color:var(--mark)}
+input[type=date]{font:inherit; padding:4px 8px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--ink); max-width:100%}
+
+/* ethics cards */
+.three{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:16px 0}
+.three > div{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:14px 16px; min-width:0}
+.three h4{margin:0 0 6px; font-family:var(--f-display); font-weight:500; font-size:17px}
+.three ul{padding-left:18px; margin:0; font-size:15px}
+
+/* case studies */
+details{background:var(--surface); border:1px solid var(--line); border-radius:8px; margin:10px 0; max-width:70ch}
+summary{cursor:pointer; padding:12px 16px; font-weight:700; list-style:none; display:flex; justify-content:space-between; gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+"; font-family:var(--f-mono); color:var(--accent)}
+details[open] summary::after{content:"–"}
+details > div{padding:0 16px 12px}
+.where{font-weight:400; color:var(--muted); font-size:14px}
+
+/* quiz */
+.quiz{display:grid; gap:14px; max-width:70ch}
+.q{background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:14px 16px}
+.q p{margin:0 0 8px; font-weight:700}
+.q .opts{display:grid; gap:6px}
+.q button{font:inherit; text-align:left; padding:8px 12px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer}
+.q button:hover{border-color:var(--accent)}
+.q button.right{border-color:var(--good); background:color-mix(in srgb, var(--good) 14%, var(--bg))}
+.q button.wrong{border-color:var(--warn); background:color-mix(in srgb, var(--warn) 12%, var(--bg))}
+.q .fb{font-size:15px; color:var(--muted); margin-top:8px}
+
+/* references */
+ol.refs{font-size:15px; max-width:76ch; padding-left:28px}
+ol.refs li{margin-bottom:10px; overflow-wrap:anywhere}
+ol.refs li:target{background:var(--mark-soft); border-radius:4px}
+
+.reviewnote{background:var(--mark-soft); border:1px dashed var(--mark); border-radius:8px; padding:16px; margin-top:12px; max-width:72ch}
+.reviewnote h3{margin-top:0}
+footer{border-top:1px solid var(--line); color:var(--muted); font-size:14px}
+footer .wrap{padding-block:20px}
+</style>
+</head>
+<body>
+
+
+<header class="top gutter">
+  <div class="wrap">
+    <span class="eyebrow">Azmi Noteworthy Series <span class="course">· Advanced Diploma in Applied Epidemiology for Disease Control and Outbreak Management</span></span>
+    <h1>Online Data Collection</h1>
+    <p class="lede">How to collect public health data with phones, tablets and web forms: what it gives us, where it goes wrong, and how to do it safely and well.</p>
+    <div>
+      <strong>After this topic you should be able to:</strong>
+      <ul class="outcomes">
+        <li>Explain what online data collection is and how it differs from paper.</li>
+        <li>Describe its benefits and its limits, using real evidence.</li>
+        <li>Plan, build and test a simple digital form with good data quality checks.</li>
+        <li>Protect privacy and follow ethical and legal rules in Malaysia.</li>
+        <li>Choose a suitable tool for a survey, a study or an outbreak.</li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<nav class="sections gutter" aria-label="Sections">
+  <div class="wrap">
+    <a href="#what">1 What it is</a>
+    <a href="#compare">2 Paper vs digital</a>
+    <a href="#challenges">3 Challenges</a>
+    <a href="#plan">4 Plan a form</a>
+    <a href="#ethics">5 Ethics &amp; law</a>
+    <a href="#tools">6 Tools</a>
+    <a href="#practice">7 Good &amp; bad practice</a>
+    <a href="#cases">8 Case studies</a>
+    <a href="#quiz">9 Quick check</a>
+    <a href="#references">References</a>
+  </div>
+</nav>
+
+<main class="gutter">
+<div class="wrap">
+
+<section id="what">
+  <span class="secno">01</span>
+  <h2>What is online data collection?</h2>
+  <p><span class="term">Online data collection</span> means recording data on an electronic form (on a phone, tablet or computer) and sending it to a central database, instead of writing on paper and typing it in later. It is also called <span class="term">electronic data capture</span>.</p>
+  <p>In epidemiology we use it for surveys, case investigations, contact tracing, disease notification and research studies. It is part of a wider field called <span class="term">digital epidemiology</span>, which uses digital data to understand health and disease in populations.<sup class="cite"><a href="#r1">1</a></sup></p>
+  <h3>Two ways to collect</h3>
+  <ul>
+    <li><b>Interviewer-administered:</b> a trained data collector asks the questions and fills the form on a device. Example: a field team doing a household survey with KoboToolbox.</li>
+    <li><b>Self-administered:</b> the respondent fills the form by themselves through a link or an app. Example: a Google Form sent by WhatsApp, or a questionnaire inside MySejahtera.</li>
+  </ul>
+  <div class="key"><strong>Key point</strong>"Online" does not always mean "always connected". Many tools let you fill forms with no internet and send them later when the signal comes back. This is called <b>offline mode</b> or <b>store-and-forward</b>.</div>
+</section>
+
+<section id="compare">
+  <span class="secno">02</span>
+  <h2>Paper vs digital: what does the evidence say?</h2>
+  <p>Digital forms remove the step of typing data from paper into a computer. That step is slow and adds errors. The table compares the two approaches.</p>
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>Step</th><th>Paper form</th><th>Digital form</th></tr></thead>
+      <tbody>
+        <tr><td>Recording</td><td>Handwriting can be hard to read. Fields can be left blank.</td><td>Required fields, valid ranges and skip logic stop many errors at the source.</td></tr>
+        <tr><td>Data entry</td><td>Someone must type it in later, often twice (double entry) to check for mistakes.</td><td>No re-typing. Data goes straight into the database.</td></tr>
+        <tr><td>Transport</td><td>Forms are carried or sent to the office. They can be lost.</td><td>Sent over the internet, or saved on the device until there is a signal.</td></tr>
+        <tr><td>Location</td><td>Address written by hand.</td><td>GPS coordinates can be captured automatically.</td></tr>
+        <tr><td>Analysis</td><td>Waits until data entry is finished.</td><td>Data can be viewed and analysed the same day.</td></tr>
+        <tr><td>Cost</td><td>Printing, storage and data entry staff.</td><td>Devices, data plans, software, training and IT support.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>What studies found</h3>
+  <ul>
+    <li>In a randomised trial in Germany, electronic case report forms were faster to fill than paper (8.3 vs 10.5 minutes) and had fewer data entry errors (0 vs 3).<sup class="cite"><a href="#r2">2</a></sup></li>
+    <li>In a household survey of over 12,000 households in Ethiopia, tablets took about the same time per person as paper. But they removed the need for double data entry, gave results right away, and recorded more accurate GPS locations.<sup class="cite"><a href="#r3">3</a></sup></li>
+    <li>During the 2015 Ebola outbreak in Sierra Leone, a smartphone app for contact tracing gave more complete data than the paper system, as the chart shows.<sup class="cite"><a href="#r4">4</a></sup></li>
+  </ul>
+  <figure>
+    <div class="bars" role="img" aria-label="Paper system: data for 39 percent of 408 contacts returned. App system: 63 percent of 556 contacts recorded as visited.">
+      <div class="bar-row"><span>Paper (408 contacts)</span><div class="bar-track"><div class="bar-fill paper" style="width:39%">39%</div></div></div>
+      <div class="bar-row"><span>App (556 contacts)</span><div class="bar-track"><div class="bar-fill app" style="width:63%">63%</div></div></div>
+      <div class="scale"><div></div><div><span>0%</span><span>50%</span><span>100%</span></div></div>
+    </div>
+    <figcaption>Ebola contacts with data reaching the district, Port Loko, Sierra Leone, 2015. The two periods were not randomised and the app also had problems in the field.<sup class="cite"><a href="#r4">4</a></sup></figcaption>
+  </figure>
+  <div class="key"><strong>Key point</strong>Digital tools usually improve speed and completeness. They do not fix a poorly designed questionnaire or poorly trained staff.</div>
+</section>
+
+<section id="challenges">
+  <span class="secno">03</span>
+  <h2>Challenges and how to manage them</h2>
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>Challenge</th><th>What goes wrong</th><th>What you can do</th></tr></thead>
+      <tbody>
+        <tr><td><b>Internet and power</b></td><td>Field areas may have weak signal and no place to charge devices.</td><td>Choose a tool with offline mode. Bring power banks. Agree when and where teams will sync.</td></tr>
+        <tr><td><b>Digital divide</b></td><td>People without a smartphone, internet or digital skills are left out. This causes <b>selection bias</b>. In Selangor, only 39.4% of COVID-19 patients used the MySejahtera Home Assessment Tool; older people and non-citizens used it less.<sup class="cite"><a href="#r5">5</a></sup></td><td>Offer other ways to respond (phone call, interviewer, paper backup). Translate forms. Check who is missing.</td></tr>
+        <tr><td><b>Self-selection in web surveys</b></td><td>When a link is shared openly, the people who answer may not represent the population. You may not know the response rate.<sup class="cite"><a href="#r6">6</a></sup></td><td>Use a defined sampling frame where possible. Report how the survey was shared and who answered, following the CHERRIES checklist.<sup class="cite"><a href="#r6">6</a></sup></td></tr>
+        <tr><td><b>Data you did not collect yourself</b></td><td>Internet data such as search trends can mislead. Google Flu Trends once estimated more than double the flu doctor visits reported by CDC.<sup class="cite"><a href="#r7">7</a></sup></td><td>Use such signals as early warnings only. Confirm with clinical and laboratory data.</td></tr>
+        <tr><td><b>Data security</b></td><td>Lost phones, shared passwords and open links can expose personal data.</td><td>Lock devices with a PIN. Give each user their own account. Limit who can see names and IC numbers.</td></tr>
+        <tr><td><b>Sustainability</b></td><td>Systems need servers, updates, licences and IT support after the project ends.</td><td>Prefer established platforms over building a new app. Plan who will maintain it and who owns the data.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="plan">
+  <span class="secno">04</span>
+  <h2>Planning and building a digital form</h2>
+  <p>Follow these steps in order. Most problems in the field come from skipping steps 2, 3 or 6.</p>
+  <ol class="steps">
+    <li><div><b>Set clear objectives.</b> Write down what decision or question the data will answer. Only collect variables that serve these objectives (data minimisation).</div></li>
+    <li><div><b>Write the case definition.</b> Define a case by person, place and time, plus clinical and laboratory criteria. Every data collector must use the same definition.</div></li>
+    <li><div><b>Make a data dictionary.</b> List every variable with its name, label, type, allowed values and whether it is required. See the example below.</div></li>
+    <li><div><b>Build the form.</b> Use the right question type for each variable. Add constraints (valid ranges) and skip logic so people only see questions that apply to them.</div></li>
+    <li><div><b>Pilot test.</b> Try the form with a few real users in the real setting. Fix confusing questions and technical bugs before full use.</div></li>
+    <li><div><b>Train the team.</b> Train on the device and app, and on interview skills and consent. Practise offline saving and syncing.</div></li>
+    <li><div><b>Collect and monitor.</b> Check incoming data every day for missing values, outliers and duplicates. Give quick feedback to the field team.</div></li>
+    <li><div><b>Manage and protect the data.</b> Back up regularly. Export a clean, de-identified copy for analysis. Keep a record of every change made during cleaning.</div></li>
+  </ol>
+
+  <h3>Example: a small data dictionary</h3>
+  <p>This is part of a data dictionary for a dengue case investigation form.</p>
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>Variable name</th><th>Question label</th><th>Type</th><th>Allowed values / rule</th><th>Required</th></tr></thead>
+      <tbody>
+        <tr><td><code>case_id</code></td><td>Case ID</td><td>Text</td><td>Auto-generated, unique</td><td><span class="pill yes">Yes</span></td></tr>
+        <tr><td><code>age_yr</code></td><td>Age (years)</td><td>Integer</td><td>0 to 120</td><td><span class="pill yes">Yes</span></td></tr>
+        <tr><td><code>sex</code></td><td>Sex</td><td>Select one</td><td>1 = Male, 2 = Female</td><td><span class="pill yes">Yes</span></td></tr>
+        <tr><td><code>onset_date</code></td><td>Date of fever onset</td><td>Date</td><td>Not after today; not before notification date minus 30 days</td><td><span class="pill yes">Yes</span></td></tr>
+        <tr><td><code>travel</code></td><td>Travelled outside the locality in the 14 days before onset?</td><td>Select one</td><td>1 = Yes, 2 = No, 9 = Don't know</td><td><span class="pill yes">Yes</span></td></tr>
+        <tr><td><code>travel_place</code></td><td>Place travelled to</td><td>Text</td><td>Show only if <code>travel = 1</code></td><td><span class="pill part">If shown</span></td></tr>
+        <tr><td><code>gps</code></td><td>Home location</td><td>Geopoint</td><td>Captured on device</td><td><span class="pill no">No</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Example: skip logic in action</h3>
+  <p>The follow-up question appears only when the answer makes it relevant. Try it.</p>
+  <div class="formmock">
+    <div class="fm-q">
+      <label for="dt">Date of fever onset</label>
+      <input id="dt" type="date" value="2026-11-02">
+      <span class="hint">Constraint: cannot be a future date.</span>
+    </div>
+    <div class="fm-q">
+      <span style="font-weight:700;font-size:15px" id="tr-l">Travelled outside the locality in the 14 days before onset?</span>
+      <div class="fm-opts" role="radiogroup" aria-labelledby="tr-l">
+        <label><input type="radio" name="travel" id="tr1" value="1"> Yes</label>
+        <label><input type="radio" name="travel" id="tr2" value="2" checked> No</label>
+        <label><input type="radio" name="travel" id="tr9" value="9"> Don't know</label>
+      </div>
+    </div>
+    <div class="fm-sub" id="travelSub" hidden>
+      <span class="tag">shown because travel = 1</span>
+      <label for="tp" style="font-weight:700;font-size:15px">Place travelled to</label>
+      <input id="tp" type="text" placeholder="e.g. Kuantan, Pahang" style="font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);max-width:100%">
+    </div>
+  </div>
+
+  <h3>Good question design</h3>
+  <ul>
+    <li>Use short, simple questions. Ask one thing per question.</li>
+    <li>Prefer closed questions (choices) over free text. Free text is hard to analyse.</li>
+    <li>Include "Don't know" and "Other (specify)" where needed.</li>
+    <li>Use the same codes for the same answers in every form (for example, 1 = Yes, 2 = No, 9 = Don't know).</li>
+    <li>Do not make every question required. Forcing an answer can lead to made-up answers.</li>
+  </ul>
+</section>
+
+<section id="ethics">
+  <span class="secno">05</span>
+  <h2>Ethics, privacy and the law</h2>
+  <p>Public health often needs personal data. We must balance the needs of the public with the rights of each person. WHO's guidelines on ethics in public health surveillance give the main principles.<sup class="cite"><a href="#r8">8</a></sup></p>
+  <div class="three">
+    <div>
+      <h4>Privacy and confidentiality</h4>
+      <ul>
+        <li>Collect only what you need.</li>
+        <li>Use encrypted platforms (https) and lock devices.</li>
+        <li>Give access by role. A field worker does not need to see the whole dataset.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Consent and transparency</h4>
+      <ul>
+        <li>Research needs informed consent. Explain the purpose, risks and how data is stored.</li>
+        <li>For surveillance, still tell people why data is collected and how it is used.</li>
+        <li>Use the respondent's language and simple words.</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Governance and sharing</h4>
+      <ul>
+        <li>Agree data ownership and sharing rules before collecting.</li>
+        <li>Remove names, IC numbers and phone numbers before sharing.</li>
+        <li>Keep public trust by using data only for its stated purpose.</li>
+      </ul>
+    </div>
+  </div>
+  <h3>Rules in Malaysia</h3>
+  <ul>
+    <li><b>Surveillance vs research.</b> Notification of infectious diseases is a legal duty under the Prevention and Control of Infectious Diseases Act 1988 (Act 342).<sup class="cite"><a href="#r9">9</a></sup> Research is different: a study involving MOH patients, staff or facilities must be registered in the National Medical Research Register (NMRR) and approved by the Medical Research and Ethics Committee (MREC) before data collection starts.<sup class="cite"><a href="#r10">10</a></sup></li>
+    <li><b>Personal data.</b> The Personal Data Protection Act 2010 (Act 709) controls how personal data is processed in commercial transactions.<sup class="cite"><a href="#r11">11</a></sup> Government agencies follow their own data rules, but its principles (notice and choice, security, retention, access) are good practice for every project.</li>
+    <li><b>Where the data is stored.</b> Free online tools may store data on overseas servers. Check your organisation's policy before putting patient data on any platform.</li>
+  </ul>
+</section>
+
+<section id="tools">
+  <span class="secno">06</span>
+  <h2>Choosing a tool</h2>
+  <p>There is no single best tool. Choose based on the job, whether you need offline use, your budget, and who will support it.</p>
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>Tool</th><th>Made by</th><th>Best for</th><th>Works offline</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td><b>Google Forms</b><sup class="cite"><a href="#r12">12</a></sup></td><td>Google</td><td>Quick self-administered surveys</td><td><span class="pill no">No</span></td><td>Free</td></tr>
+        <tr><td><b>AppSheet</b><sup class="cite"><a href="#r13">13</a></sup></td><td>Google</td><td>No-code apps built on a spreadsheet; registers and follow-up lists</td><td><span class="pill yes">Yes</span></td><td>Free to build and test; licence for wider use</td></tr>
+        <tr><td><b>KoboToolbox</b><sup class="cite"><a href="#r14">14</a></sup></td><td>Kobo (started at Harvard Humanitarian Initiative)</td><td>Field surveys; household and rapid assessments</td><td><span class="pill yes">Yes</span></td><td>Free for most non-profit use</td></tr>
+        <tr><td><b>ODK</b><sup class="cite"><a href="#r15">15</a></sup></td><td>ODK (open source)</td><td>Complex field forms; KoboToolbox uses the same form standard</td><td><span class="pill yes">Yes</span></td><td>Free software; paid hosting optional</td></tr>
+        <tr><td><b>REDCap</b><sup class="cite"><a href="#r16">16</a></sup></td><td>Vanderbilt University</td><td>Research studies, clinical data, longitudinal follow-up</td><td><span class="pill part">With mobile app</span></td><td>Free for partner institutions</td></tr>
+        <tr><td><b>Epi Info</b><sup class="cite"><a href="#r17">17</a></sup></td><td>US CDC</td><td>Form design, data entry and basic analysis and maps</td><td><span class="pill yes">Yes</span></td><td>Free</td></tr>
+        <tr><td><b>EWARS</b><sup class="cite"><a href="#r25">25</a></sup></td><td>WHO</td><td>Disease surveillance and early warning in emergencies and camps</td><td><span class="pill yes">Yes</span></td><td>Free; provided by WHO</td></tr>
+        <tr><td><b>Go.Data</b><sup class="cite"><a href="#r18">18</a></sup></td><td>WHO with GOARN</td><td>Outbreak case and contact data, transmission chains</td><td><span class="pill yes">Yes</span></td><td>Free</td></tr>
+        <tr><td><b>DHIS2</b><sup class="cite"><a href="#r19">19</a></sup></td><td>University of Oslo</td><td>National routine health information systems</td><td><span class="pill yes">Yes</span></td><td>Free software; needs a server team</td></tr>
+        <tr><td><b>SORMAS</b><sup class="cite"><a href="#r20">20</a></sup></td><td>Helmholtz Centre for Infection Research, Germany</td><td>Surveillance and outbreak management with lab results</td><td><span class="pill yes">Yes</span></td><td>Free software</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>For analysis after collection, the free <b>Epidemiologist R Handbook</b> shows how to clean data, make epidemic curves and maps, and produce routine reports in R.<sup class="cite"><a href="#r21">21</a></sup></p>
+  <div class="key"><strong>Quick guide</strong>
+    One-off online survey: Google Forms. Field survey with no signal: KoboToolbox or ODK. Research study needing an audit trail: REDCap. Outbreak contact tracing: Go.Data. A small app for your own unit: AppSheet.</div>
+</section>
+
+<section id="practice">
+  <span class="secno">07</span>
+  <h2>Good practice and bad practice</h2>
+  <p>These are common mistakes seen in real projects, and what to do instead.</p>
+  <div class="tablebox">
+    <table>
+      <thead><tr><th style="width:22%">Area</th><th style="width:39%"><span class="pill part">Bad practice</span></th><th style="width:39%"><span class="pill yes">Good practice</span></th></tr></thead>
+      <tbody>
+        <tr><td><b>Planning</b></td><td>Building the form first and deciding the objectives later.</td><td>Start with objectives, case definition and a data dictionary, then build the form.</td></tr>
+        <tr><td><b>Variable names</b></td><td>Each team uses its own spreadsheet with different column names. In the Rohingya camps, early daily spreadsheets were incomplete and had inconsistent variable names and data.<sup class="cite"><a href="#r25">25</a></sup></td><td>One shared form and one data dictionary for every site, so data can be combined straight away.<sup class="cite"><a href="#r25">25</a></sup></td></tr>
+        <tr><td><b>Question design</b></td><td>Long free-text questions, double questions, and every question set as required.</td><td>Short closed questions, "Don't know" options, skip logic, and only key fields required.</td></tr>
+        <tr><td><b>Testing</b></td><td>Sending the form to the field on day one without a pilot.</td><td>Pilot with real users in the real setting. In Ethiopia, a needs assessment and pilot let the team match the system to the survey before going large.<sup class="cite"><a href="#r3">3</a></sup></td></tr>
+        <tr><td><b>Connectivity</b></td><td>Assuming there will always be internet.</td><td>Use offline mode and agree sync points. Even EWARS struggled where there was no mobile network.<sup class="cite"><a href="#r25">25</a></sup></td></tr>
+        <tr><td><b>Alerts</b></td><td>Responding to every automatic alert as if it were an outbreak, or ignoring them all.</td><td>Verify each alert first, then assess risk, then decide: discard, monitor or respond.<sup class="cite"><a href="#r25">25</a></sup></td></tr>
+        <tr><td><b>Sampling</b></td><td>Posting an open survey link on social media and treating the result as the population.</td><td>Use a defined sampling frame where possible, and report how the survey was shared and who answered.<sup class="cite"><a href="#r6">6</a></sup></td></tr>
+        <tr><td><b>Reach</b></td><td>Using only an app, so older people and people without phones are missed.</td><td>Offer another channel (phone, interviewer, paper) and check who is not responding.<sup class="cite"><a href="#r5">5</a></sup></td></tr>
+        <tr><td><b>Privacy</b></td><td>Collecting IC numbers "just in case", sharing one login, and sending raw data by WhatsApp.</td><td>Collect only what you need, one account per user, role-based access, and share only de-identified data.<sup class="cite"><a href="#r8">8</a></sup></td></tr>
+        <tr><td><b>Data checks</b></td><td>Looking at the data only when collection ends.</td><td>Check incoming data daily and give quick feedback to field teams.</td></tr>
+        <tr><td><b>Approval</b></td><td>Starting a research survey before ethics approval.</td><td>Register in NMRR and get MREC approval before any data is collected.<sup class="cite"><a href="#r10">10</a></sup></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="cases">
+  <span class="secno">08</span>
+  <h2>Case studies</h2>
+  <details open>
+    <summary><span>EWARS Mobile in the Rohingya refugee camps <span class="where">· Cox's Bazar, Bangladesh, 2017–2018</span></span></summary>
+    <div>
+      <p><b>Background.</b> From August 2017, more than 700,000 Rohingya refugees arrived in crowded camps in Cox's Bazar. Diphtheria cases were first reported in November 2017.<sup class="cite"><a href="#r26">26</a></sup> WHO and the Bangladesh Ministry of Health and Family Welfare set up the <b>Early Warning, Alert and Response System (EWARS)</b>, a web system with a mobile app built for emergencies.<sup class="cite"><a href="#r25">25</a></sup></p>
+      <p><b>How it worked.</b> In about two weeks, staff from 151 health facilities run by 23 organisations were trained as reporting sites. From January 2018 they sent weekly case counts by age, sex and site through the EWARS mobile app, and the data appeared at once in the web system for analysis.<sup class="cite"><a href="#r25">25</a></sup></p>
+      <p><b>Verifying information.</b> EWARS raised about 100 automatic alerts each week. The WHO team checked every alert using four steps: <b>verify the alert, assess the risk, describe the risk, then decide</b> to discard, monitor or respond. Most alerts were discarded because of data entry mistakes, cases not meeting the case definition, or no real cluster.<sup class="cite"><a href="#r25">25</a></sup></p>
+      <ul>
+        <li><b>Diphtheria:</b> EWARS was used for daily monitoring of the outbreak, with forms for case reports, contact tracing, treatment centre bed counts and diphtheria antitoxin use.<sup class="cite"><a href="#r25">25</a></sup> By November 2019 there were 7,064 reported cases, and household contacts were traced for 80.7% of them.<sup class="cite"><a href="#r27">27</a></sup></li>
+        <li><b>Other diseases:</b> the same system recorded 19,215 mumps cases from 218 facilities in 2018, an epidemic that was otherwise under-reported.<sup class="cite"><a href="#r28">28</a></sup></li>
+      </ul>
+      <p><b>Problems.</b> Some camp areas had no mobile network, which made it hard to update case records during the diphtheria outbreak. Teams used laptops for case-based records.<sup class="cite"><a href="#r25">25</a></sup> Most diphtheria cases could not be laboratory confirmed.<sup class="cite"><a href="#r27">27</a></sup></p>
+      <p><b>Lessons:</b> a standard mobile reporting tool can be running in weeks, even in a crisis. Automatic alerts are only a signal: each one must be verified before action. Plan for areas with no signal.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span>Ebola contact tracing app <span class="where">· Sierra Leone, 2015</span></span></summary>
+    <div>
+      <p>Paper contact tracing had lost lists, delays and transcription errors. A smartphone app built on CommCare was linked to an alert system that told the district response centre about contacts with symptoms. Data was more complete and better stored with the app, but staff faced real problems using it during the epidemic.<sup class="cite"><a href="#r4">4</a></sup></p>
+      <p><b>Lesson:</b> digital tools can work in emergencies, but need training, support and realistic expectations.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span>Go.Data for COVID-19 <span class="where">· Region of the Americas</span></span></summary>
+    <div>
+      <p>WHO and GOARN partners supported Go.Data projects in 65 countries and territories during the pandemic. Argentina and Guatemala used it to manage case and contact data at national scale.<sup class="cite"><a href="#r22">22</a></sup></p>
+      <p><b>Lesson:</b> a ready-made, free platform can be set up faster than a new system built from scratch.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span>MySejahtera for home monitoring and research <span class="where">· Malaysia, 2021–2022</span></span></summary>
+    <div>
+      <p>COVID-19 patients isolating at home reported symptoms through the Home Assessment Tool in MySejahtera, so health staff could monitor them remotely.<sup class="cite"><a href="#r5">5</a></sup> The same app was used to send questionnaires to people who tested positive, and 44,386 people responded in a study on post-COVID-19 condition.<sup class="cite"><a href="#r23">23</a></sup></p>
+      <p><b>Lesson:</b> a national app can reach very large numbers quickly, but use was lower among older people and non-citizens, so some groups need other channels.<sup class="cite"><a href="#r5">5</a></sup></p>
+    </div>
+  </details>
+  <details>
+    <summary><span>Google searches for loss of smell <span class="where">· 8 countries, 2020</span></span></summary>
+    <div>
+      <p>Searches for loss of smell rose together with COVID-19 cases and deaths in eight countries, at a time when loss of smell was not yet a recognised symptom.<sup class="cite"><a href="#r24">24</a></sup></p>
+      <p><b>Lesson:</b> internet data can give early clues, but must be checked with clinical data (see the Google Flu Trends warning in section 3).<sup class="cite"><a href="#r7">7</a></sup></p>
+    </div>
+  </details>
+</section>
+
+<section id="quiz">
+  <span class="secno">09</span>
+  <h2>Quick check</h2>
+  <p>Tap an answer to see if you are right.</p>
+  <div class="quiz" id="quizBox"></div>
+</section>
+
+<section id="references">
+  <h2>References</h2>
+  <ol class="refs">
+    <li id="r1">Salathé M, Bengtsson L, Bodnar TJ, et al. Digital epidemiology. <i>PLoS Comput Biol</i>. 2012;8(7):e1002616. <a href="https://doi.org/10.1371/journal.pcbi.1002616">doi:10.1371/journal.pcbi.1002616</a></li>
+    <li id="r2">Fleischmann R, Decker AM, Kraft A, Mai K, Schmidt S. Mobile electronic versus paper case report forms in clinical trials: a randomized controlled trial. <i>BMC Med Res Methodol</i>. 2017;17(1):153. <a href="https://doi.org/10.1186/s12874-017-0429-y">doi:10.1186/s12874-017-0429-y</a></li>
+    <li id="r3">King JD, Buolamwini J, Cromwell EA, et al. A novel electronic data collection system for large-scale surveys of neglected tropical diseases. <i>PLoS One</i>. 2013;8(9):e74570. <a href="https://doi.org/10.1371/journal.pone.0074570">doi:10.1371/journal.pone.0074570</a></li>
+    <li id="r4">Danquah LO, Hasham N, MacFarlane M, et al. Use of a mobile application for Ebola contact tracing and monitoring in northern Sierra Leone: a proof-of-concept study. <i>BMC Infect Dis</i>. 2019;19(1):810. <a href="https://doi.org/10.1186/s12879-019-4354-z">doi:10.1186/s12879-019-4354-z</a></li>
+    <li id="r5">Farhani S, Roslina AJ, Nik Mazlina M, et al. Utilisation of the web-based Home Assessment Tool among patients with COVID-19 in Selangor, Malaysia: an observational study. <i>Malays Fam Physician</i>. 2024;19:19. <a href="https://doi.org/10.51866/oa.205">doi:10.51866/oa.205</a></li>
+    <li id="r6">Eysenbach G. Improving the quality of web surveys: the Checklist for Reporting Results of Internet E-Surveys (CHERRIES). <i>J Med Internet Res</i>. 2004;6(3):e34. <a href="https://doi.org/10.2196/jmir.6.3.e34">doi:10.2196/jmir.6.3.e34</a></li>
+    <li id="r7">Lazer D, Kennedy R, King G, Vespignani A. The parable of Google Flu: traps in big data analysis. <i>Science</i>. 2014;343(6176):1203-5. <a href="https://doi.org/10.1126/science.1248506">doi:10.1126/science.1248506</a></li>
+    <li id="r8">World Health Organization. <i>WHO guidelines on ethical issues in public health surveillance</i>. Geneva: WHO; 2017. <a href="https://www.who.int/publications/i/item/who-guidelines-on-ethical-issues-in-public-health-surveillance">who.int</a></li>
+    <li id="r9">Laws of Malaysia. Prevention and Control of Infectious Diseases Act 1988 (Act 342). Attorney General's Chambers of Malaysia. <a href="https://lom.agc.gov.my">lom.agc.gov.my</a></li>
+    <li id="r10">National Medical Research Register (NMRR), Ministry of Health Malaysia. <a href="https://nmrr.gov.my">nmrr.gov.my</a></li>
+    <li id="r11">Laws of Malaysia. Personal Data Protection Act 2010 (Act 709). Department of Personal Data Protection. <a href="https://www.pdp.gov.my">pdp.gov.my</a></li>
+    <li id="r12">Google. Google Forms Help Center. <a href="https://support.google.com/docs/topic/9055404">support.google.com</a></li>
+    <li id="r13">Google. AppSheet Help Center. <a href="https://support.google.com/appsheet">support.google.com/appsheet</a></li>
+    <li id="r14">KoboToolbox. <a href="https://www.kobotoolbox.org">kobotoolbox.org</a></li>
+    <li id="r15">ODK. <a href="https://getodk.org">getodk.org</a></li>
+    <li id="r16">Harris PA, Taylor R, Thielke R, Payne J, Gonzalez N, Conde JG. Research electronic data capture (REDCap): a metadata-driven methodology and workflow process for providing translational research informatics support. <i>J Biomed Inform</i>. 2009;42(2):377-81. <a href="https://doi.org/10.1016/j.jbi.2008.08.010">doi:10.1016/j.jbi.2008.08.010</a></li>
+    <li id="r17">Centers for Disease Control and Prevention. Epi Info. <a href="https://www.cdc.gov/epiinfo/">cdc.gov/epiinfo</a></li>
+    <li id="r18">World Health Organization. Go.Data: managing complex data in outbreaks. <a href="https://www.who.int/tools/godata">who.int/tools/godata</a></li>
+    <li id="r19">DHIS2. University of Oslo. <a href="https://dhis2.org">dhis2.org</a></li>
+    <li id="r20">SORMAS: Surveillance, Outbreak Response Management and Analysis System. <a href="https://sormas.org">sormas.org</a></li>
+    <li id="r21">Batra N, et al. <i>The Epidemiologist R Handbook</i>. Applied Epi; 2021. <a href="https://epirhandbook.com">epirhandbook.com</a></li>
+    <li id="r22">Valencia C, Jaramillo-Gutierrez G, Rearte A, et al. Adoption of digital tools in the context of the COVID-19 pandemic in the Region of the Americas: the Go.Data experience. <i>Lancet Reg Health Am</i>. 2022;16:100377. <a href="https://doi.org/10.1016/j.lana.2022.100377">doi:10.1016/j.lana.2022.100377</a></li>
+    <li id="r23">Tok PSK, Kang KY, Ng SW, et al. Post COVID-19 condition among adults in Malaysia following the Omicron wave: a prospective cohort study. <i>PLoS One</i>. 2024;19(1):e0296488. <a href="https://doi.org/10.1371/journal.pone.0296488">doi:10.1371/journal.pone.0296488</a></li>
+    <li id="r24">Walker A, Hopkins C, Surda P. Use of Google Trends to investigate loss-of-smell-related searches during the COVID-19 outbreak. <i>Int Forum Allergy Rhinol</i>. 2020;10(7):839-47. <a href="https://doi.org/10.1002/alr.22580">doi:10.1002/alr.22580</a></li>
+    <li id="r25">Karo B, Haskew C, Khan AS, Polonsky JA, Mazhar MKA, Buddha N. World Health Organization Early Warning, Alert and Response System in the Rohingya crisis, Bangladesh, 2017–2018. <i>Emerg Infect Dis</i>. 2018;24(11):2074-6. <a href="https://doi.org/10.3201/eid2411.181237">doi:10.3201/eid2411.181237</a></li>
+    <li id="r26">Feldstein LR, Bennett SD, Estivariz CF, et al. Vaccination coverage survey and seroprevalence among forcibly displaced Rohingya children, Cox's Bazar, Bangladesh, 2018: a cross-sectional study. <i>PLoS Med</i>. 2020;17(3):e1003071. <a href="https://doi.org/10.1371/journal.pmed.1003071">doi:10.1371/journal.pmed.1003071</a></li>
+    <li id="r27">Polonsky JA, Ivey M, Mazhar MKA, et al. Epidemiological, clinical, and public health response characteristics of a large outbreak of diphtheria among the Rohingya population in Cox's Bazar, Bangladesh, 2017 to 2019: a retrospective study. <i>PLoS Med</i>. 2021;18(4):e1003587. <a href="https://doi.org/10.1371/journal.pmed.1003587">doi:10.1371/journal.pmed.1003587</a></li>
+    <li id="r28">Mair L, Relan P, Hamilton DO, Al-Noman A, O'Dempsey T. Lessons learned from an under-reported mumps epidemic among Rohingya refugees in Cox's Bazar District, Bangladesh. <i>Trans R Soc Trop Med Hyg</i>. 2020;114(9):635-8. <a href="https://doi.org/10.1093/trstmh/traa048">doi:10.1093/trstmh/traa048</a></li>
+  </ol>
+  <p style="font-size:14px;color:var(--muted)">Journal articles were checked against PubMed. Software websites were the source for tool features and cost; these change, so check them before each class.</p>
+
+</section>
+
+</div>
+</main>
+<footer class="gutter"><div class="wrap"><span style="user-select:all">drsahrolazmi@moh.gov.my</span> · Online Data Collection · Advanced Diploma in Applied Epidemiology for Disease Control and Outbreak Management · November 2026</div></footer>
+
+<script>
+(function(){
+  // label table cells with their column heading (used by the phone card layout)
+  document.querySelectorAll('.tablebox table').forEach(function(t){
+    var heads=[].map.call(t.querySelectorAll('thead th'),function(th){return th.textContent.trim()});
+    t.querySelectorAll('tbody tr').forEach(function(tr){
+      [].forEach.call(tr.children,function(td,i){ if(heads[i]) td.setAttribute('data-label',heads[i]); });
+    });
+  });
+  // skip logic demo
+  var sub=document.getElementById('travelSub');
+  document.querySelectorAll('input[name=travel]').forEach(function(r){
+    r.addEventListener('change',function(){ sub.hidden = document.getElementById('tr1').checked ? false : true; });
+  });
+  var dt=document.getElementById('dt');
+  try{ dt.max=new Date().toISOString().slice(0,10); }catch(e){}
+
+  // quiz
+  var Q=[
+    {q:"What is the main reason digital forms reduce errors compared with paper?",o:["They are always online","They check answers when they are entered and remove re-typing","They are free"],a:1,e:"Constraints, required fields and skip logic stop errors at the source, and there is no second data entry step."},
+    {q:"You share a survey link on Facebook and get 2,000 replies. What is the biggest worry?",o:["Too much data","Selection bias: the people who replied may not represent the population","The form was too short"],a:1,e:"Open web links attract self-selected respondents. Report how the survey was shared, as CHERRIES recommends."},
+    {q:"Your field team will work in villages with no mobile signal. Which tool fits best?",o:["Google Forms","KoboToolbox or ODK","An email questionnaire"],a:1,e:"KoboToolbox and ODK save forms on the device and send them when a signal returns. Google Forms needs internet."},
+    {q:"EWARS raises an automatic alert for suspected diphtheria in one camp. What should happen first?",o:["Start mass treatment at once","Verify the alert: check data entry, case definition and whether there is a real cluster","Ignore it, most alerts are false"],a:1,e:"In the Rohingya camps, each alert was verified, then the risk assessed, before deciding to discard, monitor or respond."},
+    {q:"Which question should show only when travel = Yes?",o:["Age","Date of onset","Place travelled to"],a:2,e:"This is skip logic. Asking it of everyone wastes time and creates blank or wrong answers."},
+    {q:"You want to run a research survey among MOH clinic patients. What must happen first?",o:["Registration in NMRR and MREC approval","Nothing, data is anonymous","Only the clinic head's verbal permission"],a:0,e:"Research involving MOH patients or facilities must be registered in NMRR and approved by MREC before data collection."}
+  ];
+  var box=document.getElementById('quizBox');
+  Q.forEach(function(item,i){
+    var d=document.createElement('div'); d.className='q';
+    var p=document.createElement('p'); p.textContent=(i+1)+'. '+item.q; d.appendChild(p);
+    var opts=document.createElement('div'); opts.className='opts';
+    var fb=document.createElement('div'); fb.className='fb'; fb.setAttribute('aria-live','polite');
+    item.o.forEach(function(t,j){
+      var b=document.createElement('button'); b.type='button'; b.id='q'+i+'o'+j; b.textContent=t;
+      b.addEventListener('click',function(){
+        opts.querySelectorAll('button').forEach(function(x){x.classList.remove('right','wrong')});
+        if(j===item.a){ b.classList.add('right'); fb.textContent='Correct. '+item.e; }
+        else { b.classList.add('wrong'); fb.textContent='Not quite. '+item.e; }
+      });
+      opts.appendChild(b);
+    });
+    d.appendChild(opts); d.appendChild(fb); box.appendChild(d);
+  });
+})();
+</script>
+
+</body>
+</html>
