@@ -1,0 +1,428 @@
+<title>Data Detective Tutorial</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,500;7..72,700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a tutorial workbook. Each messy snapshot is drawn as a small spreadsheet, with two answer boxes under it. Same palette and fonts as the lecture page. */
+:root{
+  --bg:#fffaf0; --surface:#ffffff; --ink:#1f2433; --muted:#5b6070; --line:#f1dfc6;
+  --accent:#0d7c86; --accent-soft:#dcf4f1; --mark:#d9541e; --mark-soft:#fff0d6;
+  --good:#23824f; --grid:#e9e3d6; --gridhead:#f6f1e6; --cell:#ffffff;
+  --hero:linear-gradient(120deg,#fff3c4 0%,#ffd6a5 45%,#ffc2c7 100%);
+  --f-display:"Literata", Georgia, "Times New Roman", serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1b1726; --surface:#262035; --ink:#f3eefb; --muted:#b9b0cc; --line:#3d3452;
+  --accent:#5fd6c8; --accent-soft:#1f3a3f; --mark:#ffa45c; --mark-soft:#3d2a1d;
+  --good:#6fd39a; --grid:#3d3452; --gridhead:#2f2840; --cell:#211b2e;
+  --hero:linear-gradient(120deg,#3a2559 0%,#5a2d55 50%,#6b3a2f 100%); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#1b1726; --surface:#262035; --ink:#f3eefb; --muted:#b9b0cc; --line:#3d3452;
+  --accent:#5fd6c8; --accent-soft:#1f3a3f; --mark:#ffa45c; --mark-soft:#3d2a1d;
+  --good:#6fd39a; --grid:#3d3452; --gridhead:#2f2840; --cell:#211b2e;
+  --hero:linear-gradient(120deg,#3a2559 0%,#5a2d55 50%,#6b3a2f 100%); color-scheme:dark }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:64px}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} }
+body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:17px; line-height:1.6}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--surface)}
+a{color:var(--accent)}
+a:focus-visible, button:focus-visible, textarea:focus-visible{outline:3px solid var(--mark); outline-offset:2px}
+
+.gutter{padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px))}
+.wrap{max-width:860px; margin:0 auto}
+
+.draft{background:var(--mark-soft); border-bottom:1px solid var(--line); font-size:14px}
+.draft .wrap{padding-block:8px}
+.draft b{color:var(--mark)}
+
+header.top{background:var(--hero); border-bottom:1px solid var(--line)}
+header.top .wrap{padding-block:40px 32px; display:grid; gap:14px}
+.eyebrow{font-size:13px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; opacity:.8; line-height:1.5}
+.eyebrow .course{text-transform:none; letter-spacing:0; font-weight:400; font-size:14px}
+h1{font-family:var(--f-display); font-weight:700; font-size:clamp(30px,5vw,44px); line-height:1.15; margin:0; text-wrap:balance}
+.lede{font-size:19px; margin:0; max-width:62ch; opacity:.88}
+.motto{font-family:var(--f-mono); font-size:14px; background:var(--surface); border-radius:6px; padding:6px 10px; justify-self:start; color:var(--mark); font-weight:500}
+
+nav.sections{position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--surface); border-bottom:3px solid var(--mark)}
+nav.sections .wrap{display:flex; gap:4px; overflow-x:auto; padding-block:8px; align-items:center; -webkit-overflow-scrolling:touch}
+nav.sections a{flex:none; text-decoration:none; color:var(--muted); font-size:14px; padding:6px 10px; border-radius:6px; white-space:nowrap; min-height:36px; display:inline-flex; align-items:center}
+nav.sections a:hover{background:var(--accent-soft); color:var(--ink)}
+.progress{flex:none; margin-left:auto; font-family:var(--f-mono); font-size:13px; color:var(--accent); padding:4px 10px; border:1px solid var(--accent); border-radius:99px; white-space:nowrap}
+
+main .wrap{padding-block:12px 48px}
+section{padding-block:36px 8px; border-bottom:1px solid var(--line)}
+h2{font-family:var(--f-display); font-weight:700; font-size:clamp(24px,3.4vw,30px); line-height:1.25; margin:0 0 6px; text-wrap:balance}
+.secno{font-family:var(--f-mono); font-size:13px; color:var(--mark); background:var(--mark-soft); padding:2px 8px; border-radius:99px; display:inline-block; margin-bottom:6px; letter-spacing:.04em}
+p{margin:0 0 14px; max-width:68ch}
+ul,ol{max-width:66ch; padding-left:22px; margin:0 0 14px}
+li{margin-bottom:6px}
+.catdesc{color:var(--muted)}
+
+.intro-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:12px}
+.intro-grid > div{min-width:0; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:16px 18px}
+.intro-grid h3{font-family:var(--f-display); font-weight:500; font-size:19px; margin:0 0 8px}
+.intro-grid ul, .intro-grid ol{margin:0}
+.meta{font-size:14px; color:var(--muted); margin:14px 0 0}
+.key{background:var(--accent-soft); border-radius:8px; padding:14px 16px; margin:18px 0 0; max-width:68ch}
+.key strong{display:block; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); margin-bottom:4px}
+.key p:last-child{margin:0}
+@media (max-width:640px){ .intro-grid{grid-template-columns:1fr} }
+
+/* one example */
+.case{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px 20px 20px; margin:20px 0; display:grid; gap:14px}
+.casehead{display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+.num{font-family:var(--f-mono); font-weight:500; font-size:15px; color:var(--surface); background:var(--accent); border-radius:6px; padding:2px 8px; font-variant-numeric:tabular-nums}
+.case h3{font-family:var(--f-display); font-weight:500; font-size:20px; margin:0; flex:1 1 220px; min-width:0}
+.done{font-size:12px; font-weight:700; color:var(--good); background:color-mix(in srgb, var(--good) 15%, transparent); padding:2px 10px; border-radius:99px}
+
+@media (max-width:520px){ .case{padding:14px 14px 16px} .sheet th, .sheet td{padding:5px 8px; min-width:48px} }
+/* spreadsheet snapshot */
+.sheet{overflow-x:auto; max-width:100%; justify-self:start}
+.sheet table{border-collapse:collapse; font-family:var(--f-mono); font-size:14px; font-variant-numeric:tabular-nums}
+.sheet th, .sheet td{border:1px solid var(--grid); padding:5px 12px; text-align:left; white-space:pre; background:var(--cell); min-width:64px; height:30px}
+.sheet th.col{background:var(--gridhead); color:var(--muted); font-weight:400; font-size:12px; text-align:center; height:24px; padding:2px 12px}
+.sheet .rn{background:var(--gridhead); color:var(--muted); font-size:12px; text-align:center; min-width:34px; padding:2px 6px}
+.sheet tr.hdr td:not(.rn){font-weight:500; background:var(--mark-soft)}
+.sheet td.ctr{text-align:center}
+.sheet td.vmid{vertical-align:middle}
+.note{font-size:14px; color:var(--muted); margin:-6px 0 0}
+.challenge{margin:0; padding:10px 14px; border-left:4px solid var(--mark); background:var(--mark-soft); border-radius:0 6px 6px 0}
+.challenge b{display:block; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--mark)}
+
+/* answer boxes */
+.answers{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+@media (max-width:700px){ .answers{grid-template-columns:1fr} }
+.ans{display:grid; gap:4px; min-width:0}
+.albl{font-weight:700; display:flex; align-items:center; gap:8px}
+.tag{display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; font-family:var(--f-mono); font-size:12px; color:var(--surface)}
+.issue .tag{background:var(--mark)}
+.fix .tag{background:var(--accent)}
+.hint{font-size:14px; color:var(--muted)}
+textarea{width:100%; min-height:120px; resize:vertical; font:inherit; font-size:16px; color:var(--ink); background:var(--bg); border:1.5px dashed var(--line); border-radius:8px; padding:10px 12px; line-height:1.5}
+.issue textarea:focus{border:1.5px solid var(--mark); outline:none; background:var(--surface)}
+.fix textarea:focus{border:1.5px solid var(--accent); outline:none; background:var(--surface)}
+textarea::placeholder{color:var(--muted); opacity:.7}
+
+/* finish */
+.finish .tools{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:8px 0 14px}
+button{font:inherit; font-weight:700; font-size:15px; border-radius:8px; padding:10px 16px; cursor:pointer; border:1.5px solid var(--accent)}
+button.primary{background:var(--accent); color:var(--surface)}
+button.ghost{background:transparent; color:var(--accent)}
+button.danger{background:transparent; color:var(--mark); border-color:var(--mark)}
+.status{font-size:14px; color:var(--good)}
+.confirm{display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:15px; background:var(--mark-soft); padding:10px 14px; border-radius:8px; margin-bottom:14px}
+#copybox{width:100%; min-height:160px; font-family:var(--f-mono); font-size:13px}
+
+footer{border-top:1px solid var(--line); color:var(--muted); font-size:14px}
+footer .wrap{padding-block:20px}
+</style>
+
+<header class="top gutter"><div class="wrap">
+  <span class="eyebrow">Azmi Noteworthy Series <span class="course">· Advanced Diploma in Applied Epidemiology for Disease Control and Outbreak Management</span></span>
+  <h1>Data Detective: Spot the Mess!</h1>
+  <p class="lede">Twenty messy data snapshots from TB surveillance. For each one, find what is wrong, then explain how to clean it and how to stop it happening again.</p>
+  <span class="motto">Garbage in, garbage out.</span>
+</div></header>
+
+<nav class="sections gutter" aria-label="Sections"><div class="wrap">
+  <a href="#start">How it works</a><a href="#cat-a">A · Entry errors</a><a href="#cat-b">B · Missing data</a><a href="#cat-c">C · Invalid data</a><a href="#cat-d">D · Structure</a><a href="#finish">Finish</a>
+  <span class="progress" id="progress">0 / 20 answered</span>
+</div></nav>
+
+<main class="gutter"><div class="wrap">
+
+<section id="start">
+  <span class="secno">Tutorial</span>
+  <h2>How this tutorial works</h2>
+  <p>Data cleaning should not start only when analysis begins. Good data quality starts with good data collection. In this activity you act as a data investigator.</p>
+  <div class="intro-grid">
+    <div>
+      <h3>By the end, you can</h3>
+      <ul>
+        <li>Recognise common data quality problems.</li>
+        <li>Identify errors, inconsistencies and missing information.</li>
+        <li>Propose suitable cleaning and validation steps.</li>
+        <li>Design an online form that prevents these problems.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>For each snapshot</h3>
+      <ol>
+        <li><b>Identify the issue.</b> What is wrong, and why does it matter for epidemiological analysis?</li>
+        <li><b>Solution / how to prevent.</b> How would you clean the existing data, and how would you design the form so it does not happen again?</li>
+      </ol>
+    </div>
+  </div>
+  <p class="meta">Suggested time: 30 to 45 minutes · Group work: 3 to 5 students</p>
+  <div class="key"><strong>Remember</strong><p>Cleaning does not mean deleting, replacing or guessing values. Check the source record first. Correct only what you can verify, and flag what looks suspicious.</p></div>
+</section>
+
+<section id="cat-a"><span class="secno">Category A</span><h2>Data entry errors</h2><p class="catdesc">Mistakes made while typing or choosing a value.</p>
+<article class="case" id="ex1">
+<div class="casehead"><span class="num">01</span><h3>Inconsistent spelling and naming</h3><span class="done" id="done1" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>District</td></tr><tr><td class="rn">2</td><td>Kuantan</td></tr><tr><td class="rn">3</td><td>kuantan</td></tr><tr><td class="rn">4</td><td>KUANTAN</td></tr><tr><td class="rn">5</td><td>Ktn</td></tr><tr><td class="rn">6</td><td>Kuantan District</td></tr><tr><td class="rn">7</td><td>Kuan Tan</td></tr></tbody></table></div><p class="challenge"><b>Think about it</b>Are these six different districts or one district?</p>
+<div class="answers">
+<label class="ans issue" for="q1a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q1a" data-q="1" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q1b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q1b" data-q="1" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex2">
+<div class="casehead"><span class="num">02</span><h3>Different formats for the same variable</h3><span class="done" id="done2" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Sex</td></tr><tr><td class="rn">2</td><td>Male</td></tr><tr><td class="rn">3</td><td>M</td></tr><tr><td class="rn">4</td><td>m</td></tr><tr><td class="rn">5</td><td>Female</td></tr><tr><td class="rn">6</td><td>F</td></tr><tr><td class="rn">7</td><td>Perempuan</td></tr><tr><td class="rn">8</td><td>L</td></tr><tr><td class="rn">9</td><td>P</td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q2a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q2a" data-q="2" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q2b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q2b" data-q="2" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex3">
+<div class="casehead"><span class="num">03</span><h3>Typographical errors</h3><span class="done" id="done3" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Age (years)</td></tr><tr><td class="rn">2</td><td>25</td></tr><tr><td class="rn">3</td><td>36</td></tr><tr><td class="rn">4</td><td>4O</td></tr><tr><td class="rn">5</td><td>29</td></tr><tr><td class="rn">6</td><td>3l</td></tr><tr><td class="rn">7</td><td>45</td></tr><tr><td class="rn">8</td><td>2S</td></tr></tbody></table></div><p class="challenge"><b>Think about it</b>Look closely at every character.</p>
+<div class="answers">
+<label class="ans issue" for="q3a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q3a" data-q="3" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q3b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q3b" data-q="3" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex4">
+<div class="casehead"><span class="num">04</span><h3>Unnecessary spaces and hidden characters</h3><span class="done" id="done4" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient ID</td></tr><tr><td class="rn">2</td><td>TB001</td></tr><tr><td class="rn">3</td><td>TB002</td></tr><tr><td class="rn">4</td><td>    TB003</td></tr><tr><td class="rn">5</td><td>TB004</td></tr><tr><td class="rn">6</td><td>TB005   </td></tr><tr><td class="rn">7</td><td>TB006</td></tr></tbody></table></div><p class="challenge"><b>Think about it</b>A computer may not treat these IDs the way you see them.</p>
+<div class="answers">
+<label class="ans issue" for="q4a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q4a" data-q="4" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q4b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q4b" data-q="4" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex5">
+<div class="casehead"><span class="num">05</span><h3>Inconsistent date formats</h3><span class="done" id="done5" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Date of diagnosis</td></tr><tr><td class="rn">2</td><td>01/02/2026</td></tr><tr><td class="rn">3</td><td>2026-02-01</td></tr><tr><td class="rn">4</td><td>1 Feb 2026</td></tr><tr><td class="rn">5</td><td>02-01-2026</td></tr><tr><td class="rn">6</td><td>15/03/26</td></tr><tr><td class="rn">7</td><td>2026/03/15</td></tr></tbody></table></div><p class="challenge"><b>Think about it</b>Is 01/02/2026 1 February or 2 January?</p>
+<div class="answers">
+<label class="ans issue" for="q5a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q5a" data-q="5" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q5b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q5b" data-q="5" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+</section>
+<section id="cat-b"><span class="secno">Category B</span><h2>Missing and incomplete data</h2><p class="catdesc">Information that is blank, half-filled or recorded in many ways.</p>
+<article class="case" id="ex6">
+<div class="casehead"><span class="num">06</span><h3>Missing values represented in different ways</h3><span class="done" id="done6" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient ID</td><td>Smoking status</td></tr><tr><td class="rn">2</td><td>P001</td><td>Yes</td></tr><tr><td class="rn">3</td><td>P002</td><td>No</td></tr><tr><td class="rn">4</td><td>P003</td><td>NA</td></tr><tr><td class="rn">5</td><td>P004</td><td>-</td></tr><tr><td class="rn">6</td><td>P005</td><td>Unknown</td></tr><tr><td class="rn">7</td><td>P006</td><td></td></tr><tr><td class="rn">8</td><td>P007</td><td>Nil</td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q6a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q6a" data-q="6" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q6b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q6b" data-q="6" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex7">
+<div class="casehead"><span class="num">07</span><h3>Partially completed records</h3><span class="done" id="done7" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th><th class="col">C</th><th class="col">D</th><th class="col">E</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient ID</td><td>Age</td><td>Sex</td><td>District</td><td>Diagnosis date</td></tr><tr><td class="rn">2</td><td>P001</td><td>35</td><td>M</td><td>Kuantan</td><td>01/01/26</td></tr><tr><td class="rn">3</td><td>P002</td><td></td><td>F</td><td>Pekan</td><td>03/01/26</td></tr><tr><td class="rn">4</td><td>P003</td><td>44</td><td></td><td>Rompin</td><td></td></tr><tr><td class="rn">5</td><td>P004</td><td>28</td><td>M</td><td></td><td>08/01/26</td></tr><tr><td class="rn">6</td><td>P005</td><td></td><td></td><td></td><td></td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q7a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q7a" data-q="7" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q7b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q7b" data-q="7" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex8">
+<div class="casehead"><span class="num">08</span><h3>Incomplete multiple-response data</h3><span class="done" id="done8" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Symptoms</td></tr><tr><td class="rn">2</td><td>Fever, cough</td></tr><tr><td class="rn">3</td><td>Cough; weight loss</td></tr><tr><td class="rn">4</td><td>Fever / night sweats</td></tr><tr><td class="rn">5</td><td>Fever, cough,</td></tr><tr><td class="rn">6</td><td>Weight loss</td></tr><tr><td class="rn">7</td><td>Fever + Cough + Night Sweats</td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q8a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q8a" data-q="8" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q8b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q8b" data-q="8" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex9">
+<div class="casehead"><span class="num">09</span><h3>Incomplete address or location information</h3><span class="done" id="done9" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Village</td><td>District</td></tr><tr><td class="rn">2</td><td>Kampung Baru</td><td></td></tr><tr><td class="rn">3</td><td>Kg. Cherating</td><td>Kuantan</td></tr><tr><td class="rn">4</td><td></td><td>Pekan</td></tr><tr><td class="rn">5</td><td>Felda Chini</td><td>Pekan</td></tr><tr><td class="rn">6</td><td>Kampung Orang Asli</td><td></td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q9a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q9a" data-q="9" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q9b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q9b" data-q="9" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex10">
+<div class="casehead"><span class="num">10</span><h3>Missing denominator or population information</h3><span class="done" id="done10" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th><th class="col">C</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>District</td><td>TB cases</td><td>Population</td></tr><tr><td class="rn">2</td><td>Kuantan</td><td>150</td><td>550,000</td></tr><tr><td class="rn">3</td><td>Pekan</td><td>65</td><td></td></tr><tr><td class="rn">4</td><td>Rompin</td><td>45</td><td>120,000</td></tr><tr><td class="rn">5</td><td>Bera</td><td>30</td><td></td></tr></tbody></table></div><p class="challenge"><b>Think about it</b>Can you calculate and compare TB incidence rates for all four districts?</p>
+<div class="answers">
+<label class="ans issue" for="q10a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q10a" data-q="10" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q10b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q10b" data-q="10" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+</section>
+<section id="cat-c"><span class="secno">Category C</span><h2>Inconsistent and invalid data</h2><p class="catdesc">Values that break logic, rules or common sense.</p>
+<article class="case" id="ex11">
+<div class="casehead"><span class="num">11</span><h3>Impossible age values</h3><span class="done" id="done11" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient ID</td><td>Age</td></tr><tr><td class="rn">2</td><td>P001</td><td>25</td></tr><tr><td class="rn">3</td><td>P002</td><td>-5</td></tr><tr><td class="rn">4</td><td>P003</td><td>150</td></tr><tr><td class="rn">5</td><td>P004</td><td>0</td></tr><tr><td class="rn">6</td><td>P005</td><td>999</td></tr><tr><td class="rn">7</td><td>P006</td><td>42</td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q11a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q11a" data-q="11" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q11b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q11b" data-q="11" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex12">
+<div class="casehead"><span class="num">12</span><h3>Invalid date sequence</h3><span class="done" id="done12" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th><th class="col">C</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient ID</td><td>Symptom onset</td><td>Diagnosis date</td></tr><tr><td class="rn">2</td><td>P001</td><td>10/01/2026</td><td>15/01/2026</td></tr><tr><td class="rn">3</td><td>P002</td><td>20/01/2026</td><td>18/01/2026</td></tr><tr><td class="rn">4</td><td>P003</td><td>05/02/2026</td><td>01/02/2026</td></tr><tr><td class="rn">5</td><td>P004</td><td>10/02/2026</td><td>25/02/2026</td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q12a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q12a" data-q="12" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q12b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q12b" data-q="12" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex13">
+<div class="casehead"><span class="num">13</span><h3>Contradictory information</h3><span class="done" id="done13" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th><th class="col">C</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient ID</td><td>Pregnancy status</td><td>Sex</td></tr><tr><td class="rn">2</td><td>P001</td><td>Pregnant</td><td>Male</td></tr><tr><td class="rn">3</td><td>P002</td><td>Not pregnant</td><td>Female</td></tr><tr><td class="rn">4</td><td>P003</td><td>Pregnant</td><td>Female</td></tr><tr><td class="rn">5</td><td>P004</td><td>Unknown</td><td>Male</td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q13a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q13a" data-q="13" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q13b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q13b" data-q="13" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex14">
+<div class="casehead"><span class="num">14</span><h3>Values outside permitted categories</h3><span class="done" id="done14" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>TB classification</td></tr><tr><td class="rn">2</td><td>Pulmonary</td></tr><tr><td class="rn">3</td><td>Extra-pulmonary</td></tr><tr><td class="rn">4</td><td>PTB</td></tr><tr><td class="rn">5</td><td>EPTB</td></tr><tr><td class="rn">6</td><td>Lung TB</td></tr><tr><td class="rn">7</td><td>TB lymph node</td></tr><tr><td class="rn">8</td><td>MDR</td></tr><tr><td class="rn">9</td><td>Drug resistant</td></tr><tr><td class="rn">10</td><td>Positive</td></tr><tr><td class="rn">11</td><td>Negative</td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q14a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q14a" data-q="14" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q14b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q14b" data-q="14" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex15">
+<div class="casehead"><span class="num">15</span><h3>Outliers and suspicious values</h3><span class="done" id="done15" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient ID</td><td>Temperature (°C)</td></tr><tr><td class="rn">2</td><td>P001</td><td>37.2</td></tr><tr><td class="rn">3</td><td>P002</td><td>38.5</td></tr><tr><td class="rn">4</td><td>P003</td><td>39.1</td></tr><tr><td class="rn">5</td><td>P004</td><td>370</td></tr><tr><td class="rn">6</td><td>P005</td><td>36.8</td></tr><tr><td class="rn">7</td><td>P006</td><td>98.6</td></tr></tbody></table></div><p class="challenge"><b>Think about it</b>Is 370 a genuine reading, a misplaced decimal point or a Fahrenheit/Celsius issue?</p>
+<div class="answers">
+<label class="ans issue" for="q15a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q15a" data-q="15" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q15b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q15b" data-q="15" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+</section>
+<section id="cat-d"><span class="secno">Category D</span><h2>Structural and formatting problems</h2><p class="catdesc">The sheet layout itself makes analysis hard.</p>
+<article class="case" id="ex16">
+<div class="casehead"><span class="num">16</span><h3>Multiple variables stored in one column</h3><span class="done" id="done16" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient information</td></tr><tr><td class="rn">2</td><td>Ahmad, 35, Male, Kuantan</td></tr><tr><td class="rn">3</td><td>Siti, 28, Female, Pekan</td></tr><tr><td class="rn">4</td><td>Kumar, 42, Male, Rompin</td></tr><tr><td class="rn">5</td><td>Ali, 31, M, Bera</td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q16a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q16a" data-q="16" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q16b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q16b" data-q="16" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex17">
+<div class="casehead"><span class="num">17</span><h3>Multiple values stored in one cell</h3><span class="done" id="done17" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient ID</td><td>Contact details</td></tr><tr><td class="rn">2</td><td>P001</td><td>0123456789 / 0134567890</td></tr><tr><td class="rn">3</td><td>P002</td><td>0198765432</td></tr><tr><td class="rn">4</td><td>P003</td><td>01112345678 / 0145678901 / 0167890123</td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q17a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q17a" data-q="17" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q17b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q17b" data-q="17" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex18">
+<div class="casehead"><span class="num">18</span><h3>Merged cells and unstructured headers</h3><span class="done" id="done18" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th><th class="col">C</th><th class="col">D</th><th class="col">E</th></tr></thead><tbody>
+<tr class="hdr"><td class="rn">1</td><td rowspan="2" class="vmid">District</td><td colspan="2" class="ctr merged">January</td><td colspan="2" class="ctr merged">February</td></tr>
+<tr class="hdr"><td class="rn">2</td><td>Male</td><td>Female</td><td>Male</td><td>Female</td></tr>
+<tr><td class="rn">3</td><td>Kuantan</td><td>10</td><td>8</td><td>12</td><td>9</td></tr>
+<tr><td class="rn">4</td><td>Pekan</td><td>5</td><td>4</td><td>6</td><td>3</td></tr>
+<tr><td class="rn">5</td><td>Rompin</td><td>3</td><td>2</td><td>4</td><td>5</td></tr>
+</tbody></table></div><p class="note">This is a report-style table. It should not be used as a raw data collection sheet.</p><p class="challenge"><b>Think about it</b>How would you restructure this for database analysis?</p>
+<div class="answers">
+<label class="ans issue" for="q18a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q18a" data-q="18" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q18b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q18b" data-q="18" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex19">
+<div class="casehead"><span class="num">19</span><h3>Different units of measurement</h3><span class="done" id="done19" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient ID</td><td>Weight</td></tr><tr><td class="rn">2</td><td>P001</td><td>65 kg</td></tr><tr><td class="rn">3</td><td>P002</td><td>72</td></tr><tr><td class="rn">4</td><td>P003</td><td>154 lbs</td></tr><tr><td class="rn">5</td><td>P004</td><td>80KG</td></tr><tr><td class="rn">6</td><td>P005</td><td>68 kilograms</td></tr></tbody></table></div>
+<div class="answers">
+<label class="ans issue" for="q19a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q19a" data-q="19" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q19b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q19b" data-q="19" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+<article class="case" id="ex20">
+<div class="casehead"><span class="num">20</span><h3>Duplicate records</h3><span class="done" id="done20" hidden>Answered</span></div>
+<div class="sheet"><table><thead><tr><th class="rn"></th><th class="col">A</th><th class="col">B</th><th class="col">C</th></tr></thead><tbody><tr class="hdr"><td class="rn">1</td><td>Patient ID</td><td>Name</td><td>Date of diagnosis</td></tr><tr><td class="rn">2</td><td>P001</td><td>Ahmad</td><td>01/01/2026</td></tr><tr><td class="rn">3</td><td>P002</td><td>Siti</td><td>02/01/2026</td></tr><tr><td class="rn">4</td><td>P001</td><td>Ahmad</td><td>01/01/2026</td></tr><tr><td class="rn">5</td><td>P003</td><td>Kumar</td><td>05/01/2026</td></tr><tr><td class="rn">6</td><td>P004</td><td>Ali</td><td>06/01/2026</td></tr><tr><td class="rn">7</td><td>P002</td><td>Siti</td><td>02/01/2026</td></tr></tbody></table></div><p class="challenge"><b>Think about it</b>Are these genuine duplicate records? What identifiers would you use to verify?</p>
+<div class="answers">
+<label class="ans issue" for="q20a"><span class="albl"><span class="tag">1</span>Identify the issue</span><span class="hint">What is wrong? Why does it matter for analysis?</span>
+<textarea id="q20a" data-q="20" rows="4" placeholder="Write your answer here…"></textarea></label>
+<label class="ans fix" for="q20b"><span class="albl"><span class="tag">2</span>Solution / how to prevent</span><span class="hint">How would you clean it? How would you stop it happening again?</span>
+<textarea id="q20b" data-q="20" rows="4" placeholder="Write your answer here…"></textarea></label>
+</div></article>
+</section>
+
+<section id="finish" class="finish">
+  <span class="secno">Finish</span>
+  <h2>Save and share your answers</h2>
+  <p>Your answers stay in this browser on this device, so you can close the page and come back. To hand them in, copy all your answers and paste them into your group's document or the class form.</p>
+  <div class="tools">
+    <button type="button" class="primary" id="copyBtn">Copy all my answers</button>
+    <button type="button" class="danger" id="clearBtn">Clear all answers</button>
+    <span class="status" id="status" role="status"></span>
+  </div>
+  <div class="confirm" id="confirmClear" hidden>
+    <span>Delete all your answers on this device? This cannot be undone.</span>
+    <button type="button" class="danger" id="yesClear">Yes, clear</button>
+    <button type="button" class="ghost" id="noClear">Keep them</button>
+  </div>
+  <textarea id="copybox" readonly hidden aria-label="All answers as text"></textarea>
+  <div class="key"><strong>Final message</strong><p>A clean dataset is not always good-quality data. A well-formatted spreadsheet can still hold wrong information. Data cleaning fixes the dataset. Good form design prevents the problem in the first place.</p></div>
+</section>
+
+</div></main>
+
+<footer class="gutter"><div class="wrap"><span style="user-select:all">drsahrolazmi@moh.gov.my</span> · Data Detective Tutorial · Advanced Diploma in Applied Epidemiology for Disease Control and Outbreak Management · November 2026</div></footer>
+
+<script>
+(function(){
+  var KEY='ded-tutorial-answers-v1', store={};
+  try{ store=JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(e){ store={}; }
+  var boxes=[].slice.call(document.querySelectorAll('textarea[data-q]'));
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} }
+  function refresh(){
+    var n=0;
+    for(var i=1;i<=20;i++){
+      var a=(document.getElementById('q'+i+'a').value||'').trim(), b=(document.getElementById('q'+i+'b').value||'').trim();
+      var d=document.getElementById('done'+i); var ok=!!(a&&b); d.hidden=!ok; if(ok) n++;
+    }
+    document.getElementById('progress').textContent=n+' / 20 answered';
+  }
+  boxes.forEach(function(t){
+    if(store[t.id]) t.value=store[t.id];
+    t.addEventListener('input',function(){ store[t.id]=t.value; save(); refresh(); });
+  });
+  refresh();
+
+  function allText(){
+    var out=['Data Detective: Spot the Mess! – my answers',''];
+    document.querySelectorAll('.case').forEach(function(c,idx){
+      var i=idx+1, title=c.querySelector('h3').textContent;
+      out.push(i+'. '+title);
+      out.push('Issue: '+((document.getElementById('q'+i+'a').value||'').trim()||'(blank)'));
+      out.push('Solution / prevention: '+((document.getElementById('q'+i+'b').value||'').trim()||'(blank)'));
+      out.push('');
+    });
+    return out.join('\n');
+  }
+  var status=document.getElementById('status'), box=document.getElementById('copybox');
+  document.getElementById('copyBtn').addEventListener('click',function(){
+    var txt=allText();
+    function fallback(){ box.hidden=false; box.value=txt; box.focus(); box.select(); status.textContent='Text selected below. Copy it with Ctrl+C or long-press.'; }
+    try{
+      navigator.clipboard.writeText(txt).then(function(){ status.textContent='Copied. Paste it into your document.'; box.hidden=true; }, fallback);
+    }catch(e){ fallback(); }
+  });
+  var conf=document.getElementById('confirmClear');
+  document.getElementById('clearBtn').addEventListener('click',function(){ conf.hidden=false; });
+  document.getElementById('noClear').addEventListener('click',function(){ conf.hidden=true; });
+  document.getElementById('yesClear').addEventListener('click',function(){
+    boxes.forEach(function(t){ t.value=''; }); store={}; save(); refresh(); conf.hidden=true; box.hidden=true; status.textContent='All answers cleared.';
+  });
+})();
+</script>
